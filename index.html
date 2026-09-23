@@ -88,13 +88,38 @@
     <div class="panel">
       <h2>Controlli</h2>
       <div class="warnings" id="warnings">Nessuna anomalia.</div>
-      <div class="footnote">Regole attive: D'Agostino deve avere il posto accanto vuoto. Una persona non può comparire in più di un posto.</div>
+      <div class="footnote">Regole attive: Paolo deve avere il posto accanto vuoto. Una persona non può comparire in più di un posto.</div>
     </div>
   </div>
 </div>
 
 <script>
 const people = ["Ballarino","Belletti","Bonazza","D'Agostino","Dalic","Devescovi","Di Donato","Druzina","Ferrara","Gherbaz","Giannice","Greco","Hervatin","Kogovsek","Moscheni","Nitu","Petris","Podda","Sorgo","Tosoni","Viccari","Bonsignori"];
+
+const displayName={
+  "Ballarino":"Matilde",
+  "Belletti":"Pierfrancesco",
+  "Bonazza":"Giacomo",
+  "D'Agostino":"Paolo",
+  "Dalic":"Ogi",
+  "Devescovi":"Gabriele",
+  "Di Donato":"Sofia",
+  "Druzina":"Eva",
+  "Ferrara":"Giulia",
+  "Gherbaz":"Thomas",
+  "Giannice":"Damiano",
+  "Greco":"Adelaide",
+  "Hervatin":"Sirya",
+  "Kogovsek":"Margherita",
+  "Moscheni":"Leonardo",
+  "Nitu":"Dario",
+  "Petris":"Mavi",
+  "Podda":"Olga",
+  "Sorgo":"Letizia",
+  "Tosoni":"Lisa",
+  "Viccari":"Anna",
+  "Bonsignori":"Federico"
+};
 
 const matrix = {
 "Ballarino":{"Belletti":0,"Bonazza":0,"D'Agostino":0,"Dalic":0,"Devescovi":0,"Di Donato":0,"Druzina":155,"Ferrara":64,"Gherbaz":0,"Giannice":0,"Greco":43,"Hervatin":0,"Kogovsek":56,"Moscheni":0,"Nitu":22,"Petris":0,"Podda":0,"Sorgo":42,"Tosoni":42,"Viccari":0,"Bonsignori":0},
@@ -142,7 +167,7 @@ function render(){
     const current=state[di][si]; const used=usedSet(di,si);
     const empty=document.createElement('option');empty.value='';empty.textContent='- Vuoto -';sel.appendChild(empty);
     people.forEach(p=>{
-      const opt=document.createElement('option');opt.value=p;opt.textContent=p;
+      const opt=document.createElement('option');opt.value=p;opt.textContent=displayName[p] || p;
       if(used.has(p)&&p!==current)opt.disabled=true;
       if(p===current)opt.selected=true;
       sel.appendChild(opt);
@@ -152,14 +177,14 @@ function render(){
       const other=state[di][1-si];
       state[di][si]=sel.value;
       if(sel.value==="D'Agostino") state[di][1-si]='';
-      if(other==="D'Agostino" && sel.value){state[di][si]='';alert("D'Agostino deve avere il posto accanto vuoto.");}
+      if(other==="D'Agostino" && sel.value){state[di][si]='';alert("Paolo deve avere il posto accanto vuoto.");}
       render();
     });
     seats.appendChild(sel);
    }
    let msg='';
-   if(a==="D'Agostino"&&b)msg="D'Agostino deve avere il posto accanto vuoto.";
-   if(b==="D'Agostino"&&a)msg="D'Agostino deve avere il posto accanto vuoto.";
+   if(a==="D'Agostino"&&b)msg="Paolo deve avere il posto accanto vuoto.";
+   if(b==="D'Agostino"&&a)msg="Paolo deve avere il posto accanto vuoto.";
    desk.querySelector('.rule').textContent=msg;
    row.appendChild(desk);
   }
@@ -169,11 +194,11 @@ function render(){
 }
 function updateMeta(){
  const used=usedSet();document.getElementById('statusText').textContent=`${used.size} persone assegnate su ${people.length}`;
- const roster=document.getElementById('roster');roster.innerHTML='';people.forEach(p=>{const x=document.createElement('span');x.className='person'+(used.has(p)?' used':'');x.textContent=p;roster.appendChild(x)});
+ const roster=document.getElementById('roster');roster.innerHTML='';people.forEach(p=>{const x=document.createElement('span');x.className='person'+(used.has(p)?' used':'');x.textContent=displayName[p] || p;roster.appendChild(x)});
  const problems=[];
  for(let di=0;di<state.length;di++){
   const [a,b]=state[di];
-  if((a==="D'Agostino"&&b)||(b==="D'Agostino"&&a))problems.push("D'Agostino non è da solo");
+  if((a==="D'Agostino"&&b)||(b==="D'Agostino"&&a))problems.push("Paolo non è da solo");
  }
  document.getElementById('warnings').innerHTML=problems.length?`<strong>Da correggere:</strong><br>${[...new Set(problems)].join('<br>')}`:'Nessuna anomalia.';
 }
