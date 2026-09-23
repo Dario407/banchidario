@@ -56,39 +56,60 @@
   .drag-ghost{position:fixed;z-index:9999;pointer-events:none;background:#172033;color:#fff;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:800;transform:translate(-50%,-50%);box-shadow:0 8px 24px rgba(0,0,0,.2)}
   @media(max-width:900px){
     .wrap{padding:12px}
-    h1{font-size:23px}
-    .sub{font-size:13px}
+    h1{font-size:24px;line-height:1.1}
+    .sub{font-size:13px;line-height:1.4}
     .top{flex-direction:column;gap:12px}
-    .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:7px}
-    .actions button{width:100%;padding:11px 8px;font-size:12px}
-    .toolbar{padding:10px;gap:10px}
-    .legend{gap:5px;font-size:10px}
-    .classroom{padding:10px;border-radius:14px;overflow-x:hidden}
-    .teacher{margin-bottom:12px;padding:9px}
-    .row{grid-template-columns:54px repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
-    .row-label{min-height:110px;padding:6px;font-size:11px}
-    .row-label small{font-size:8px;padding:0 2px}
-    .desk{padding:6px;min-height:110px;border-radius:12px}
-    .desk-head{font-size:9px;margin-bottom:6px;gap:3px}
-    .badge{font-size:8px;padding:3px 5px;white-space:nowrap}
-    .seats{gap:4px}
-    .seat-wrap{padding:3px;gap:3px}
-    select{font-size:11px;padding:8px 3px}
-    .avg-row{font-size:8px;min-height:22px}
-    .rule{font-size:8px;margin-top:4px}
-    .side{grid-template-columns:1fr;gap:10px;margin-top:10px}
-    .panel{padding:11px}
-    .person{font-size:11px;padding:7px 9px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:8px}
+    .actions button{width:100%;padding:12px 8px;font-size:13px}
+    .toolbar{padding:11px;gap:10px}
+    .legend{gap:7px;font-size:11px;line-height:1.3}
+    .status{font-size:12px}
+    .classroom{padding:12px;border-radius:14px}
+    .teacher{margin:0 auto 14px;padding:10px;font-size:13px}
+    .row{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-bottom:16px;
+      align-items:stretch
+    }
+    .row-label{
+      grid-column:1/-1;
+      min-height:auto;
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:13px;
+      flex-direction:row;
+      gap:6px
+    }
+    .row-label small{font-size:10px;margin:0;padding:0}
+    .desk{padding:8px;min-height:138px;border-radius:12px}
+    .desk-head{font-size:10px;margin-bottom:8px;gap:5px}
+    .badge{font-size:9px;padding:4px 6px;white-space:nowrap}
+    .seats{grid-template-columns:1fr;gap:6px}
+    .seat-wrap{padding:4px;gap:4px}
+    select{font-size:13px;padding:9px 7px;min-height:40px}
+    .avg-row{font-size:10px;min-height:14px;line-height:1.25}
+    .rule{font-size:9px;margin-top:5px;min-height:0}
+    .side{grid-template-columns:1fr;gap:10px;margin-top:12px}
+    .panel{padding:12px}
+    .panel h2{font-size:15px}
+    .drag-hint{font-size:11px}
+    .person{font-size:12px;padding:8px 10px}
+    .person small{font-size:10px}
   }
-  @media(max-width:520px){
-    .row{grid-template-columns:42px repeat(3,minmax(0,1fr));gap:4px}
-    .row-label{font-size:10px}
-    .row-label small{display:none}
-    .desk{padding:4px}
-    .desk-head span:first-child{display:none}
-    .badge{font-size:7px}
-    select{font-size:10px;padding:7px 2px}
-    .avg-row{font-size:7px}
+  @media(max-width:600px){
+    .actions{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr}
+    .row-label{grid-column:1}
+    .desk{min-height:auto;padding:10px}
+    .desk-head{font-size:11px}
+    .desk-head span:first-child{display:inline}
+    .badge{font-size:10px}
+    .seats{grid-template-columns:1fr 1fr;gap:8px}
+    select{font-size:14px;padding:10px 8px}
+    .avg-row{font-size:10px}
+    .legend{font-size:10px}
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
