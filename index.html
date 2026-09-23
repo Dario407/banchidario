@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Planner Banchi 3BES</title>
+<style>
+  :root{--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--line:#dfe5ee;--accent:#2f6fed;--shadow:0 10px 28px rgba(30,55,90,.08)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  .wrap{max-width:1250px;margin:0 auto;padding:26px}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+  h1{font-size:28px;margin:0 0 7px}
+  .sub{color:var(--muted);font-size:14px;max-width:760px;line-height:1.45}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  button{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:650;cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button:hover{filter:brightness(.98)}
+  .toolbar{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+  .legend{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .sw{display:inline-flex;align-items:center;gap:5px}.dot{width:18px;height:10px;border-radius:999px;border:1px solid rgba(0,0,0,.08)}
+  .status{font-size:13px;color:var(--muted)}
+  .classroom{background:#eef2f8;border:1px solid #d6ddea;border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+  .teacher{width:min(420px,90%);margin:0 auto 24px;background:#253858;color:white;text-align:center;padding:11px 16px;border-radius:12px;font-weight:800;letter-spacing:.04em}
+  .row{display:grid;grid-template-columns:110px repeat(3,1fr);gap:14px;align-items:stretch;margin-bottom:14px}
+  .row-label{display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:800;color:#344054;min-height:130px}
+  .row-label small{font-size:11px;color:var(--muted);font-weight:600;margin-top:5px;text-align:center;padding:0 8px}
+  .desk{background:#fff;border:2px solid #e1e6ef;border-radius:16px;padding:12px;min-height:130px;transition:.18s;position:relative}
+  .desk-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:#667085}
+  .badge{font-weight:800;border-radius:999px;padding:4px 8px;background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.06);color:#344054}
+  .seats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  select{width:100%;border:1px solid #ccd4df;background:rgba(255,255,255,.88);border-radius:10px;padding:10px 8px;font-size:14px;color:#172033;outline:none}
+  select:focus{border-color:#82a7ff;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
+  select:disabled{opacity:.6;background:#f3f4f6}
+  .rule{margin-top:8px;min-height:18px;font-size:11px;font-weight:700;color:#b42318}
+  .desk.new{background:#eaf8ee;border-color:#8fd3a3}
+  .desk.low{background:#fff8d8;border-color:#e9cf62}
+  .desk.mid{background:#ffe1ad;border-color:#eab05a}
+  .desk.high{background:#ffc8ae;border-color:#e2815b}
+  .desk.veryhigh{background:#ffaaa3;border-color:#d9534f}
+  .desk.single{background:#eef4ff;border-color:#9ebcff}
+  .side{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+  .panel h2{font-size:16px;margin:0 0 10px}
+  .roster{display:flex;gap:7px;flex-wrap:wrap}.person{background:#f2f4f7;border:1px solid #e2e6ec;padding:6px 9px;border-radius:999px;font-size:12px}.person.used{opacity:.35;text-decoration:line-through}
+  .warnings{font-size:13px;line-height:1.5;color:#475467}.warnings strong{color:#172033}
+  .footnote{margin-top:14px;color:#7a8495;font-size:11px;line-height:1.45}
+  @media(max-width:900px){.row{grid-template-columns:1fr}.row-label{min-height:auto;padding:9px}.side{grid-template-columns:1fr}.top{flex-direction:column}.actions{justify-content:flex-start}.desk{min-height:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Planner Banchi 3BES</h1>
+      <div class="sub">Componi le coppie e controlla subito se due persone sono già state insieme. I colori rappresentano il totale dei giorni registrati nello storico verificato del Google Fogli.</div>
+    </div>
+    <div class="actions">
+      <button id="resetBtn">Azzera</button>
+      <button id="saveBtn">Salva disposizione</button>
+      <button id="loadBtn">Ripristina salvata</button>
+      <button class="primary" id="suggestBtn">Genera coppie nuove</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="legend">
+      <b>Legenda:</b>
+      <span class="sw"><i class="dot" style="background:#eaf8ee"></i>Mai insieme</span>
+      <span class="sw"><i class="dot" style="background:#fff8d8"></i>1-30 gg</span>
+      <span class="sw"><i class="dot" style="background:#ffe1ad"></i>31-60 gg</span>
+      <span class="sw"><i class="dot" style="background:#ffc8ae"></i>61-100 gg</span>
+      <span class="sw"><i class="dot" style="background:#ffaaa3"></i>101+ gg</span>
+    </div>
+    <div class="status" id="statusText">0 persone assegnate</div>
+  </div>
+
+  <div class="classroom">
+    <div class="teacher">CATTEDRA</div>
+    <div id="rows"></div>
+  </div>
+
+  <div class="side">
+    <div class="panel">
+      <h2>Persone</h2>
+      <div class="roster" id="roster"></div>
+    </div>
+    <div class="panel">
+      <h2>Controlli</h2>
+      <div class="warnings" id="warnings">Nessuna anomalia.</div>
+      <div class="footnote">Regole attive: D'Agostino deve avere il posto accanto vuoto. Una persona non può comparire in più di un posto.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const people = ["Ballarino","Belletti","Bonazza","D'Agostino","Dalic","Devescovi","Di Donato","Druzina","Ferrara","Gherbaz","Giannice","Greco","Hervatin","Kogovsek","Moscheni","Nitu","Petris","Podda","Sorgo","Tosoni","Viccari","Bonsignori"];
+
+const matrix = {
+"Ballarino":{"Belletti":0,"Bonazza":0,"D'Agostino":0,"Dalic":0,"Devescovi":0,"Di Donato":0,"Druzina":155,"Ferrara":64,"Gherbaz":0,"Giannice":0,"Greco":43,"Hervatin":0,"Kogovsek":56,"Moscheni":0,"Nitu":22,"Petris":0,"Podda":0,"Sorgo":42,"Tosoni":42,"Viccari":0,"Bonsignori":0},
+"Belletti":{"Bonazza":90,"D'Agostino":0,"Dalic":0,"Devescovi":22,"Di Donato":0,"Druzina":0,"Ferrara":0,"Gherbaz":0,"Giannice":42,"Greco":56,"Hervatin":0,"Kogovsek":42,"Moscheni":0,"Nitu":0,"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Bonazza":{"D'Agostino":0,"Dalic":101,"Devescovi":42,"Di Donato":0,"Druzina":0,"Ferrara":0,"Gherbaz":0,"Giannice":0,"Greco":28,"Hervatin":22,"Kogovsek":0,"Moscheni":0,"Nitu":30,"Petris":43,"Podda":0,"Sorgo":56,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"D'Agostino":{"Dalic":0,"Devescovi":0,"Di Donato":143,"Druzina":0,"Ferrara":42,"Gherbaz":0,"Giannice":0,"Greco":0,"Hervatin":42,"Kogovsek":0,"Moscheni":22,"Nitu":0,"Petris":64,"Podda":0,"Sorgo":0,"Tosoni":28,"Viccari":0,"Bonsignori":0},
+"Dalic":{"Devescovi":82,"Di Donato":28,"Druzina":0,"Ferrara":0,"Gherbaz":22,"Giannice":0,"Greco":0,"Hervatin":0,"Kogovsek":42,"Moscheni":64,"Nitu":85,"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Devescovi":{"Di Donato":0,"Druzina":42,"Ferrara":0,"Gherbaz":0,"Giannice":0,"Greco":0,"Hervatin":101,"Kogovsek":0,"Moscheni":43,"Nitu":64,"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Di Donato":{"Druzina":121,"Ferrara":0,"Gherbaz":26,"Giannice":0,"Greco":0,"Hervatin":0,"Kogovsek":0,"Moscheni":0,"Nitu":0,"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":106,"Bonsignori":0},
+"Druzina":{"Ferrara":0,"Gherbaz":0,"Giannice":0,"Greco":64,"Hervatin":0,"Kogovsek":0,"Moscheni":0,"Nitu":0,"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":42,"Bonsignori":0},
+"Ferrara":{"Gherbaz":0,"Giannice":0,"Greco":0,"Hervatin":42,"Kogovsek":0,"Moscheni":0,"Nitu":56,"Petris":0,"Podda":0,"Sorgo":43,"Tosoni":22,"Viccari":0,"Bonsignori":30},
+"Gherbaz":{"Giannice":0,"Greco":0,"Hervatin":0,"Kogovsek":0,"Moscheni":126,"Nitu":0,"Petris":0,"Podda":43,"Sorgo":0,"Tosoni":101,"Viccari":0,"Bonsignori":0},
+"Giannice":{"Greco":0,"Hervatin":0,"Kogovsek":0,"Moscheni":0,"Nitu":0,"Petris":22,"Podda":106,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Greco":{"Hervatin":26,"Kogovsek":0,"Moscheni":0,"Nitu":0,"Petris":0,"Podda":0,"Sorgo":143,"Tosoni":42,"Viccari":0,"Bonsignori":0},
+"Hervatin":{"Kogovsek":43,"Moscheni":0,"Nitu":0,"Petris":0,"Podda":0,"Sorgo":64,"Tosoni":56,"Viccari":0,"Bonsignori":0},
+"Kogovsek":{"Moscheni":80,"Nitu":26,"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":64,"Viccari":22,"Bonsignori":0},
+"Moscheni":{"Nitu":63,"Petris":26,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Nitu":{"Petris":0,"Podda":0,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Petris":{"Podda":199,"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Podda":{"Sorgo":0,"Tosoni":0,"Viccari":0,"Bonsignori":0},
+"Sorgo":{"Tosoni":26,"Viccari":0,"Bonsignori":0},
+"Tosoni":{"Viccari":0,"Bonsignori":0},
+"Viccari":{"Bonsignori":0}
+};
+
+const avgRow={"Ballarino":2.8467,"Belletti":2.1769,"Bonazza":2.5307,"D'Agostino":2.6981,"Dalic":2.7288,"Devescovi":2.9151,"Di Donato":2.7335,"Druzina":2.2241,"Ferrara":2.7406,"Gherbaz":2.3349,"Giannice":1.5575,"Greco":2.8679,"Hervatin":3.1364,"Kogovsek":2.2980,"Moscheni":1.7925,"Nitu":3.0425,"Petris":1.2828,"Podda":1.1014,"Sorgo":3.0833,"Tosoni":3.0142,"Viccari":3.3186};
+
+const state=Array.from({length:12},()=>["",""]);
+function days(a,b){if(!a||!b)return 0;if(a===b)return 999;return matrix[a]?.[b] ?? matrix[b]?.[a] ?? 0;}
+function bucket(d){if(d===0)return 'new';if(d<=30)return 'low';if(d<=60)return 'mid';if(d<=100)return 'high';return 'veryhigh';}
+function label(d,a,b){if(!a&&!b)return 'Vuoto';if(a&&!b||!a&&b)return 'Singolo';if(d===0)return 'Mai insieme';return `${d} giorni`;}
+function usedSet(exceptDesk=-1,exceptSeat=-1){const s=new Set();state.forEach((pair,di)=>pair.forEach((p,si)=>{if(p && !(di===exceptDesk&&si===exceptSeat))s.add(p)}));return s;}
+function render(){
+ const rows=document.getElementById('rows'); rows.innerHTML='';
+ for(let r=0;r<4;r++){
+  const row=document.createElement('div');row.className='row';
+  const lab=document.createElement('div');lab.className='row-label';lab.innerHTML=`${r+1}ª fila<small>${r===0?'più vicina alla cattedra':r===3?'più lontana':'zona intermedia'}</small>`;row.appendChild(lab);
+  for(let c=0;c<3;c++){
+   const di=r*3+c, [a,b]=state[di], d=days(a,b);
+   const desk=document.createElement('div');desk.className='desk '+(a&&b?bucket(d):(a||b?'single':''));
+   desk.innerHTML=`<div class="desk-head"><span>Bancata ${c+1}</span><span class="badge">${label(d,a,b)}</span></div><div class="seats"></div><div class="rule"></div>`;
+   const seats=desk.querySelector('.seats');
+   for(let si=0;si<2;si++){
+    const sel=document.createElement('select');
+    const current=state[di][si]; const used=usedSet(di,si);
+    const empty=document.createElement('option');empty.value='';empty.textContent='- Vuoto -';sel.appendChild(empty);
+    people.forEach(p=>{
+      const opt=document.createElement('option');opt.value=p;opt.textContent=p;
+      if(used.has(p)&&p!==current)opt.disabled=true;
+      if(p===current)opt.selected=true;
+      sel.appendChild(opt);
+    });
+    if((a==="D'Agostino"&&si===1)||(b==="D'Agostino"&&si===0)) {sel.value='';sel.disabled=true;state[di][si]='';}
+    sel.addEventListener('change',()=>{
+      const other=state[di][1-si];
+      state[di][si]=sel.value;
+      if(sel.value==="D'Agostino") state[di][1-si]='';
+      if(other==="D'Agostino" && sel.value){state[di][si]='';alert("D'Agostino deve avere il posto accanto vuoto.");}
+      render();
+    });
+    seats.appendChild(sel);
+   }
+   let msg='';
+   if(a==="D'Agostino"&&b)msg="D'Agostino deve avere il posto accanto vuoto.";
+   if(b==="D'Agostino"&&a)msg="D'Agostino deve avere il posto accanto vuoto.";
+   desk.querySelector('.rule').textContent=msg;
+   row.appendChild(desk);
+  }
+  rows.appendChild(row);
+ }
+ updateMeta();
+}
+function updateMeta(){
+ const used=usedSet();document.getElementById('statusText').textContent=`${used.size} persone assegnate su ${people.length}`;
+ const roster=document.getElementById('roster');roster.innerHTML='';people.forEach(p=>{const x=document.createElement('span');x.className='person'+(used.has(p)?' used':'');x.textContent=p;roster.appendChild(x)});
+ const problems=[];
+ for(let di=0;di<state.length;di++){
+  const [a,b]=state[di];
+  if((a==="D'Agostino"&&b)||(b==="D'Agostino"&&a))problems.push("D'Agostino non è da solo");
+ }
+ document.getElementById('warnings').innerHTML=problems.length?`<strong>Da correggere:</strong><br>${[...new Set(problems)].join('<br>')}`:'Nessuna anomalia.';
+}
+function reset(){for(let i=0;i<12;i++)state[i]=['',''];render()}
+function suggest(){
+ reset();
+ const pool=[...people];
+ // D'Agostino resta da solo; lo posizioniamo nella fila più vicina alla sua media storica.
+ const dAgostinoDesk=(Math.max(1,Math.min(4,Math.round(avgRow["D'Agostino"]||3)))-1)*3;
+ state[dAgostinoDesk][0]="D'Agostino";
+ let remaining=pool.filter(p=>p!=="D'Agostino");
+ const slots=[];for(let i=0;i<12;i++)for(let s=0;s<2;s++){if(i===dAgostinoDesk&&s===1)continue;if(!state[i][s])slots.push([i,s]);}
+ function score(p,di,si){
+  const row=Math.floor(di/3)+1; const other=state[di][1-si];
+  const pair=other?days(p,other):0;
+  const pos=avgRow[p]?Math.abs(avgRow[p]-row)*9:0;
+  return pair*5+pos+Math.random()*2;
+ }
+ // Fill with greedy look-ahead prioritizing zero-day pairs and usual row.
+ for(const [di,si] of slots){
+   if(!remaining.length)break;
+   remaining.sort((a,b)=>score(a,di,si)-score(b,di,si));
+   const p=remaining.shift();state[di][si]=p;
+ }
+ render();
+}
+document.getElementById('resetBtn').onclick=()=>{if(confirm('Azzerare tutta la disposizione?'))reset()};
+document.getElementById('saveBtn').onclick=()=>{localStorage.setItem('planner3bes',JSON.stringify(state));document.getElementById('statusText').textContent='Disposizione salvata sul dispositivo';setTimeout(updateMeta,1200)};
+document.getElementById('loadBtn').onclick=()=>{try{const s=JSON.parse(localStorage.getItem('planner3bes'));if(Array.isArray(s)&&s.length===12){for(let i=0;i<12;i++)state[i]=s[i];render()}}catch(e){}};
+document.getElementById('suggestBtn').onclick=suggest;
+render();
+</script>
+</body>
+</html>
