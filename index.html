@@ -42,11 +42,56 @@
   .side{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
   .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
   .panel h2{font-size:16px;margin:0 0 10px}
-  .roster{display:flex;gap:7px;flex-wrap:wrap}.person{background:#f2f4f7;border:1px solid #e2e6ec;padding:6px 9px;border-radius:999px;font-size:12px}.person.used{opacity:.35;text-decoration:line-through}
+  .roster{display:flex;gap:8px;flex-wrap:wrap}
+  .person{background:#f2f4f7;border:1px solid #e2e6ec;padding:8px 10px;border-radius:12px;font-size:12px;cursor:grab;user-select:none;touch-action:none;display:flex;flex-direction:column;gap:2px}
+  .person small{font-size:10px;color:#667085;font-weight:600}
+  .person.used{opacity:.38;text-decoration:none}
+  .seat-wrap{position:relative;display:flex;flex-direction:column;gap:5px;padding:6px;border-radius:12px;border:1px dashed transparent;transition:.15s;min-width:0;touch-action:none}
+  .seat-wrap.drag-over{border-color:#2f6fed;background:rgba(47,111,237,.08)}
+  .avg-row{font-size:10px;color:#667085;font-weight:700;line-height:1.25;min-height:25px}
+  .drag-hint{font-size:11px;color:#667085;margin:0 0 9px;line-height:1.4}
   .warnings{font-size:13px;line-height:1.5;color:#475467}.warnings strong{color:#172033}
   .footnote{margin-top:14px;color:#7a8495;font-size:11px;line-height:1.45}
-  @media(max-width:900px){.row{grid-template-columns:1fr}.row-label{min-height:auto;padding:9px}.side{grid-template-columns:1fr}.top{flex-direction:column}.actions{justify-content:flex-start}.desk{min-height:auto}}
+  body.dragging{user-select:none}
+  .drag-ghost{position:fixed;z-index:9999;pointer-events:none;background:#172033;color:#fff;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:800;transform:translate(-50%,-50%);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+  @media(max-width:900px){
+    .wrap{padding:12px}
+    h1{font-size:23px}
+    .sub{font-size:13px}
+    .top{flex-direction:column;gap:12px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:7px}
+    .actions button{width:100%;padding:11px 8px;font-size:12px}
+    .toolbar{padding:10px;gap:10px}
+    .legend{gap:5px;font-size:10px}
+    .classroom{padding:10px;border-radius:14px;overflow-x:hidden}
+    .teacher{margin-bottom:12px;padding:9px}
+    .row{grid-template-columns:54px repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
+    .row-label{min-height:110px;padding:6px;font-size:11px}
+    .row-label small{font-size:8px;padding:0 2px}
+    .desk{padding:6px;min-height:110px;border-radius:12px}
+    .desk-head{font-size:9px;margin-bottom:6px;gap:3px}
+    .badge{font-size:8px;padding:3px 5px;white-space:nowrap}
+    .seats{gap:4px}
+    .seat-wrap{padding:3px;gap:3px}
+    select{font-size:11px;padding:8px 3px}
+    .avg-row{font-size:8px;min-height:22px}
+    .rule{font-size:8px;margin-top:4px}
+    .side{grid-template-columns:1fr;gap:10px;margin-top:10px}
+    .panel{padding:11px}
+    .person{font-size:11px;padding:7px 9px}
+  }
+  @media(max-width:520px){
+    .row{grid-template-columns:42px repeat(3,minmax(0,1fr));gap:4px}
+    .row-label{font-size:10px}
+    .row-label small{display:none}
+    .desk{padding:4px}
+    .desk-head span:first-child{display:none}
+    .badge{font-size:7px}
+    select{font-size:10px;padding:7px 2px}
+    .avg-row{font-size:7px}
+  }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -59,6 +104,7 @@
       <button id="resetBtn">Azzera</button>
       <button id="saveBtn">Salva disposizione</button>
       <button id="loadBtn">Ripristina salvata</button>
+      <button id="imageBtn">Salva come immagine</button>
       <button class="primary" id="suggestBtn">Genera coppie nuove</button>
     </div>
   </div>
@@ -83,6 +129,7 @@
   <div class="side">
     <div class="panel">
       <h2>Persone</h2>
+      <div class="drag-hint">Trascina un nome su un posto. Puoi anche trascinare una persona già seduta su un altro banco.</div>
       <div class="roster" id="roster"></div>
     </div>
     <div class="panel">
@@ -148,6 +195,68 @@ const matrix = {
 const avgRow={"Ballarino":2.8467,"Belletti":2.1769,"Bonazza":2.5307,"D'Agostino":2.6981,"Dalic":2.7288,"Devescovi":2.9151,"Di Donato":2.7335,"Druzina":2.2241,"Ferrara":2.7406,"Gherbaz":2.3349,"Giannice":1.5575,"Greco":2.8679,"Hervatin":3.1364,"Kogovsek":2.2980,"Moscheni":1.7925,"Nitu":3.0425,"Petris":1.2828,"Podda":1.1014,"Sorgo":3.0833,"Tosoni":3.0142,"Viccari":3.3186};
 
 const state=Array.from({length:12},()=>["",""]);
+function avgLabel(p){
+  const v=avgRow[p];
+  if(!v)return "media N/D";
+  const fila=Math.max(1,Math.min(4,Math.round(v)));
+  return `media ${v.toFixed(2).replace('.',',')} - circa ${fila}ª fila`;
+}
+function locatePerson(p){
+  for(let di=0;di<state.length;di++)for(let si=0;si<2;si++)if(state[di][si]===p)return [di,si];
+  return null;
+}
+function canPlace(p,di,si){
+  const other=state[di][1-si];
+  if(p==="D'Agostino" && other)return false;
+  if(other==="D'Agostino" && p)return false;
+  return true;
+}
+function movePerson(p,di,si){
+  if(!p || !canPlace(p,di,si)){
+    if(p) alert("Paolo deve avere il posto accanto vuoto.");
+    return;
+  }
+  const old=locatePerson(p);
+  const displaced=state[di][si];
+  if(old){state[old[0]][old[1]]='';}
+  if(displaced && displaced!==p){
+    if(old && canPlace(displaced,old[0],old[1])) state[old[0]][old[1]]=displaced;
+  }
+  state[di][si]=p;
+  if(p==="D'Agostino") state[di][1-si]='';
+  render();
+}
+let pointerDrag=null, dragGhost=null;
+function startPointerDrag(e,p){
+  if(e.pointerType==="mouse" && e.button!==0)return;
+  pointerDrag={p,moved:false,startX:e.clientX,startY:e.clientY};
+  const move=ev=>{
+    if(!pointerDrag)return;
+    const dist=Math.hypot(ev.clientX-pointerDrag.startX,ev.clientY-pointerDrag.startY);
+    if(dist<6 && !pointerDrag.moved)return;
+    pointerDrag.moved=true;
+    document.body.classList.add('dragging');
+    if(!dragGhost){
+      dragGhost=document.createElement('div');
+      dragGhost.className='drag-ghost';
+      dragGhost.textContent=displayName[p]||p;
+      document.body.appendChild(dragGhost);
+    }
+    dragGhost.style.left=ev.clientX+'px';dragGhost.style.top=ev.clientY+'px';
+  };
+  const up=ev=>{
+    window.removeEventListener('pointermove',move);
+    window.removeEventListener('pointerup',up);
+    if(pointerDrag?.moved){
+      const el=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('.seat-wrap');
+      if(el) movePerson(p,Number(el.dataset.di),Number(el.dataset.si));
+    }
+    pointerDrag=null;document.body.classList.remove('dragging');
+    dragGhost?.remove();dragGhost=null;
+  };
+  window.addEventListener('pointermove',move,{passive:true});
+  window.addEventListener('pointerup',up,{once:true});
+}
 function days(a,b){if(!a||!b)return 0;if(a===b)return 999;return matrix[a]?.[b] ?? matrix[b]?.[a] ?? 0;}
 function bucket(d){if(d===0)return 'new';if(d<=30)return 'low';if(d<=60)return 'mid';if(d<=100)return 'high';return 'veryhigh';}
 function label(d,a,b){if(!a&&!b)return 'Vuoto';if(a&&!b||!a&&b)return 'Singolo';if(d===0)return 'Mai insieme';return `${d} giorni`;}
@@ -163,6 +272,10 @@ function render(){
    desk.innerHTML=`<div class="desk-head"><span>Bancata ${c+1}</span><span class="badge">${label(d,a,b)}</span></div><div class="seats"></div><div class="rule"></div>`;
    const seats=desk.querySelector('.seats');
    for(let si=0;si<2;si++){
+    const wrap=document.createElement('div');wrap.className='seat-wrap';wrap.dataset.di=di;wrap.dataset.si=si;
+    wrap.addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('drag-over')});
+    wrap.addEventListener('dragleave',()=>wrap.classList.remove('drag-over'));
+    wrap.addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('drag-over');movePerson(e.dataTransfer.getData('text/plain'),di,si)});
     const sel=document.createElement('select');
     const current=state[di][si]; const used=usedSet(di,si);
     const empty=document.createElement('option');empty.value='';empty.textContent='- Vuoto -';sel.appendChild(empty);
@@ -174,13 +287,18 @@ function render(){
     });
     if((a==="D'Agostino"&&si===1)||(b==="D'Agostino"&&si===0)) {sel.value='';sel.disabled=true;state[di][si]='';}
     sel.addEventListener('change',()=>{
-      const other=state[di][1-si];
-      state[di][si]=sel.value;
-      if(sel.value==="D'Agostino") state[di][1-si]='';
-      if(other==="D'Agostino" && sel.value){state[di][si]='';alert("Paolo deve avere il posto accanto vuoto.");}
-      render();
+      const chosen=sel.value;
+      if(chosen) movePerson(chosen,di,si); else {state[di][si]='';render();}
     });
-    seats.appendChild(sel);
+    wrap.appendChild(sel);
+    const info=document.createElement('div');info.className='avg-row';info.textContent=current?avgLabel(current):'';
+    wrap.appendChild(info);
+    if(current){
+      wrap.draggable=true;
+      wrap.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',current);e.dataTransfer.effectAllowed='move'});
+      wrap.addEventListener('pointerdown',e=>{if(e.target.tagName!=='SELECT')startPointerDrag(e,current)});
+    }
+    seats.appendChild(wrap);
    }
    let msg='';
    if(a==="D'Agostino"&&b)msg="Paolo deve avere il posto accanto vuoto.";
@@ -194,7 +312,7 @@ function render(){
 }
 function updateMeta(){
  const used=usedSet();document.getElementById('statusText').textContent=`${used.size} persone assegnate su ${people.length}`;
- const roster=document.getElementById('roster');roster.innerHTML='';people.forEach(p=>{const x=document.createElement('span');x.className='person'+(used.has(p)?' used':'');x.textContent=displayName[p] || p;roster.appendChild(x)});
+ const roster=document.getElementById('roster');roster.innerHTML='';people.forEach(p=>{const x=document.createElement('div');x.className='person'+(used.has(p)?' used':'');x.draggable=true;x.innerHTML=`<strong>${displayName[p]||p}</strong><small>${avgLabel(p)}</small>`;x.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',p);e.dataTransfer.effectAllowed='move'});x.addEventListener('pointerdown',e=>startPointerDrag(e,p));roster.appendChild(x)});
  const problems=[];
  for(let di=0;di<state.length;di++){
   const [a,b]=state[di];
@@ -228,6 +346,19 @@ function suggest(){
 document.getElementById('resetBtn').onclick=()=>{if(confirm('Azzerare tutta la disposizione?'))reset()};
 document.getElementById('saveBtn').onclick=()=>{localStorage.setItem('planner3bes',JSON.stringify(state));document.getElementById('statusText').textContent='Disposizione salvata sul dispositivo';setTimeout(updateMeta,1200)};
 document.getElementById('loadBtn').onclick=()=>{try{const s=JSON.parse(localStorage.getItem('planner3bes'));if(Array.isArray(s)&&s.length===12){for(let i=0;i<12;i++)state[i]=s[i];render()}}catch(e){}};
+document.getElementById('imageBtn').onclick=async()=>{
+  const target=document.querySelector('.classroom');
+  const btn=document.getElementById('imageBtn');
+  const old=btn.textContent;btn.textContent='Creo immagine...';btn.disabled=true;
+  try{
+    const canvas=await html2canvas(target,{backgroundColor:'#eef2f8',scale:2,useCORS:true});
+    const a=document.createElement('a');
+    a.download='banchi-3bes.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  }catch(e){alert("Non sono riuscito a creare l'immagine.");}
+  btn.textContent=old;btn.disabled=false;
+};
 document.getElementById('suggestBtn').onclick=suggest;
 render();
 </script>
