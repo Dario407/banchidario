@@ -217,11 +217,8 @@ function movePerson(p,di,si){
     return;
   }
   const old=locatePerson(p);
-  const displaced=state[di][si];
-  if(old){state[old[0]][old[1]]='';}
-  if(displaced && displaced!==p){
-    if(old && canPlace(displaced,old[0],old[1])) state[old[0]][old[1]]=displaced;
-  }
+  if(old && old[0]===di && old[1]===si){render();return;}
+  if(old) state[old[0]][old[1]]='';
   state[di][si]=p;
   if(p==="D'Agostino") state[di][1-si]='';
   render();
@@ -249,7 +246,16 @@ function startPointerDrag(e,p){
     window.removeEventListener('pointerup',up);
     if(pointerDrag?.moved){
       const el=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('.seat-wrap');
-      if(el) movePerson(p,Number(el.dataset.di),Number(el.dataset.si));
+      if(el){
+        const di=Number(el.dataset.di), si=Number(el.dataset.si);
+        const oldPos=locatePerson(p);
+        if(oldPos && !(oldPos[0]===di && oldPos[1]===si)){
+          const ok=confirm(`${displayName[p]||p} è già seduto/a in un altro posto. Vuoi spostarlo/a qui?`);
+          if(ok) movePerson(p,di,si);
+        } else {
+          movePerson(p,di,si);
+        }
+      }
     }
     pointerDrag=null;document.body.classList.remove('dragging');
     dragGhost?.remove();dragGhost=null;
@@ -275,20 +281,34 @@ function render(){
     const wrap=document.createElement('div');wrap.className='seat-wrap';wrap.dataset.di=di;wrap.dataset.si=si;
     wrap.addEventListener('dragover',e=>{e.preventDefault();wrap.classList.add('drag-over')});
     wrap.addEventListener('dragleave',()=>wrap.classList.remove('drag-over'));
-    wrap.addEventListener('drop',e=>{e.preventDefault();wrap.classList.remove('drag-over');movePerson(e.dataTransfer.getData('text/plain'),di,si)});
+    wrap.addEventListener('drop',e=>{
+      e.preventDefault();wrap.classList.remove('drag-over');
+      const p=e.dataTransfer.getData('text/plain');
+      const oldPos=locatePerson(p);
+      if(oldPos && !(oldPos[0]===di && oldPos[1]===si)){
+        const ok=confirm(`${displayName[p]||p} è già seduto/a in un altro posto. Vuoi spostarlo/a qui?`);
+        if(!ok){render();return;}
+      }
+      movePerson(p,di,si);
+    });
     const sel=document.createElement('select');
     const current=state[di][si]; const used=usedSet(di,si);
     const empty=document.createElement('option');empty.value='';empty.textContent='- Vuoto -';sel.appendChild(empty);
     people.forEach(p=>{
       const opt=document.createElement('option');opt.value=p;opt.textContent=displayName[p] || p;
-      if(used.has(p)&&p!==current)opt.disabled=true;
       if(p===current)opt.selected=true;
       sel.appendChild(opt);
     });
     if((a==="D'Agostino"&&si===1)||(b==="D'Agostino"&&si===0)) {sel.value='';sel.disabled=true;state[di][si]='';}
     sel.addEventListener('change',()=>{
       const chosen=sel.value;
-      if(chosen) movePerson(chosen,di,si); else {state[di][si]='';render();}
+      if(!chosen){state[di][si]='';render();return;}
+      const oldPos=locatePerson(chosen);
+      if(oldPos && !(oldPos[0]===di && oldPos[1]===si)){
+        const ok=confirm(`${displayName[chosen]||chosen} è già seduto/a in un altro posto. Vuoi spostarlo/a qui?`);
+        if(!ok){render();return;}
+      }
+      movePerson(chosen,di,si);
     });
     wrap.appendChild(sel);
     const info=document.createElement('div');info.className='avg-row';info.textContent=current?avgLabel(current):'';
