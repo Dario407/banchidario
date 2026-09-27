@@ -5,33 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Planner Banchi 3BES</title>
 <style>
-:root{--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--line:#dfe5ee;--accent:#2f6fed;--shadow:0 10px 28px rgba(30,55,90,.08)}
+:root{--bg:#f5f7fb;--text:#172033;--muted:#667085;--line:#dfe5ee;--accent:#2f6fed;--shadow:0 10px 28px rgba(30,55,90,.08)}
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:1280px;margin:0 auto;padding:24px}
+.wrap{max-width:1320px;margin:0 auto;padding:24px}
 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
-h1{font-size:29px;margin:0 0 6px}
+h1{font-size:30px;margin:0 0 6px}
 .sub{color:var(--muted);font-size:14px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 button{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:650;cursor:pointer}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .title-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px}
 .title-box label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:8px}
-.title-box input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:12px 10px;font-size:16px;color:#172033;outline:none}
+.title-box input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:13px 11px;font-size:17px;color:#172033;outline:none}
 .title-box input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
-.print-sheet{background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:28px;box-shadow:var(--shadow);aspect-ratio:297 / 210;display:flex;flex-direction:column;justify-content:flex-start}
-.sheet-title{text-align:center;font-size:32px;font-weight:800;margin:0 0 20px;color:#172033;min-height:38px;word-break:break-word}
-.classroom{background:#fff;border:1px solid #dfe5ee;border-radius:18px;padding:26px;flex:1}
-.teacher{width:min(460px,90%);margin:0 auto 26px;background:#253858;color:white;text-align:center;padding:12px 18px;border-radius:14px;font-weight:800;letter-spacing:.04em;font-size:18px}
-.row{display:grid;grid-template-columns:110px repeat(3,1fr);gap:16px;align-items:stretch;margin-bottom:16px}
+.print-sheet{background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:18px 18px 20px;box-shadow:var(--shadow)}
+.sheet-title{text-align:center;font-size:40px;font-weight:800;line-height:1.1;margin:2px 0 14px;color:#172033;word-break:break-word}
+.classroom{background:#fff;border:1px solid #dfe5ee;border-radius:18px;padding:18px}
+.teacher{width:min(500px,90%);margin:0 auto 16px;background:#253858;color:white;text-align:center;padding:13px 18px;border-radius:14px;font-weight:800;letter-spacing:.04em;font-size:22px}
+.row{display:grid;grid-template-columns:115px repeat(3,1fr);gap:14px;align-items:stretch;margin-bottom:14px}
 .row:last-child{margin-bottom:0}
-.row-label{display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:800;color:#344054;min-height:126px;font-size:15px}
-.desk{background:#fff;border:1px solid #dfe5ee;border-radius:16px;padding:14px;min-height:126px;box-shadow:0 4px 12px rgba(30,55,90,.05)}
-.desk-head{font-size:14px;color:#667085;font-weight:800;margin-bottom:10px;text-align:center}
+.row-label{display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:800;color:#344054;min-height:118px;font-size:22px}
+.desk{background:#fff;border:1px solid #dfe5ee;border-radius:16px;padding:12px;min-height:118px;box-shadow:0 4px 12px rgba(30,55,90,.05)}
+.desk-head{font-size:21px;color:#667085;font-weight:800;margin-bottom:10px;text-align:center;line-height:1.1}
 .seats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-input.seat-input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:11px 9px;font-size:15px;line-height:1.2;color:#172033;outline:none;text-align:center;font-weight:650;min-height:44px}
+input.seat-input,.export-seat{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;font-size:21px;line-height:1.15;color:#172033;text-align:center;font-weight:650;min-height:52px}
+input.seat-input{padding:11px 10px;outline:none}
 input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
-.export-seat{width:100%;min-height:44px;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:8px 7px;font-size:15px;line-height:1.2;color:#172033;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:650;overflow:visible;white-space:normal;word-break:break-word}
+.export-seat{padding:8px 9px;display:flex;align-items:center;justify-content:center;overflow:visible;white-space:normal;word-break:break-word}
+@media(max-width:1100px){
+  .sheet-title{font-size:34px}
+  .row-label{font-size:19px}
+  .desk-head{font-size:18px}
+  input.seat-input,.export-seat{font-size:18px;min-height:48px}
+}
 @media(max-width:900px){
   .wrap{padding:12px}
   .top{flex-direction:column;gap:12px}
@@ -39,16 +46,16 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
   .sub{font-size:13px}
   .actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
   .actions button{width:100%;padding:12px 8px;font-size:13px}
-  .print-sheet{padding:12px;aspect-ratio:auto}
-  .sheet-title{font-size:24px;margin-bottom:12px;min-height:30px}
+  .print-sheet{padding:12px}
+  .sheet-title{font-size:26px;margin-bottom:10px}
   .classroom{padding:12px}
-  .teacher{margin-bottom:14px;font-size:16px}
-  .row{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
-  .row-label{grid-column:1/-1;min-height:auto;padding:8px;font-size:13px}
-  .desk{min-height:126px;padding:9px}
-  .desk-head{font-size:12px}
+  .teacher{margin-bottom:12px;font-size:17px;padding:11px 14px}
+  .row{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+  .row-label{grid-column:1/-1;min-height:auto;padding:8px;font-size:15px}
+  .desk{min-height:112px;padding:9px}
+  .desk-head{font-size:13px}
   .seats{grid-template-columns:1fr;gap:7px}
-  input.seat-input,.export-seat{font-size:14px;min-height:42px}
+  input.seat-input,.export-seat{font-size:15px;min-height:42px}
 }
 @media(max-width:600px){
   .actions{grid-template-columns:1fr}
@@ -56,7 +63,10 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
   .row-label{grid-column:1}
   .desk{min-height:auto}
   .seats{grid-template-columns:1fr 1fr;gap:8px}
-  input.seat-input,.export-seat{font-size:15px;min-height:44px}
+  .sheet-title{font-size:22px}
+  .row-label{font-size:14px}
+  .desk-head{font-size:12px}
+  input.seat-input,.export-seat{font-size:14px;min-height:40px}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -84,10 +94,7 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
 
   <div class="print-sheet" id="printSheet">
     <div class="sheet-title" id="sheetTitle"></div>
-    <div class="classroom">
-      <div class="teacher">CATTEDRA</div>
-      <div id="rows"></div>
-    </div>
+    <div class="classroom" id="classroom"></div>
   </div>
 </div>
 
@@ -98,8 +105,7 @@ let flipped=false;
 
 function render(){
   document.getElementById('sheetTitle').textContent=customTitle || '';
-
-  const classroom=document.querySelector('.classroom');
+  const classroom=document.getElementById('classroom');
   classroom.innerHTML='';
 
   const teacher=document.createElement('div');
@@ -111,6 +117,7 @@ function render(){
 
   const rowOrder=flipped ? [3,2,1,0] : [0,1,2,3];
   const deskOrder=flipped ? [2,1,0] : [0,1,2];
+  const seatOrder=flipped ? [1,0] : [0,1];
 
   if(!flipped) classroom.appendChild(teacher);
 
@@ -123,14 +130,12 @@ function render(){
     label.textContent=(r+1)+'ª fila';
     row.appendChild(label);
 
-    for(const cIndex of deskOrder){
-      const di=r*3+cIndex;
+    for(const c of deskOrder){
+      const di=r*3+c;
       const desk=document.createElement('div');
       desk.className='desk';
-      desk.innerHTML='<div class="desk-head">Bancata '+(cIndex+1)+'</div><div class="seats"></div>';
+      desk.innerHTML='<div class="desk-head">Bancata '+(c+1)+'</div><div class="seats"></div>';
       const seats=desk.querySelector('.seats');
-
-      const seatOrder=flipped ? [1,0] : [0,1];
 
       for(const si of seatOrder){
         const input=document.createElement('input');
@@ -144,14 +149,15 @@ function render(){
       }
       row.appendChild(desk);
     }
+
     rows.appendChild(row);
   }
 
   classroom.appendChild(rows);
   if(flipped) classroom.appendChild(teacher);
-
   document.getElementById('rotateBtn').textContent = flipped ? 'Vista normale' : 'Gira aula';
 }
+
 function sanitizeFileName(str){
   return (str || '')
     .trim()
@@ -230,25 +236,21 @@ document.getElementById('imageBtn').onclick=async()=>{
     finalCanvas.width=3508;
     finalCanvas.height=2480;
     const ctx=finalCanvas.getContext('2d');
-
     ctx.fillStyle='#ffffff';
     ctx.fillRect(0,0,finalCanvas.width,finalCanvas.height);
 
-    const margin=100;
+    const margin=90;
     const maxW=finalCanvas.width-margin*2;
     const maxH=finalCanvas.height-margin*2;
-
     const ratio=Math.min(maxW/shot.width,maxH/shot.height);
     const drawW=shot.width*ratio;
     const drawH=shot.height*ratio;
     const x=(finalCanvas.width-drawW)/2;
     const y=(finalCanvas.height-drawH)/2;
-
     ctx.drawImage(shot,x,y,drawW,drawH);
 
     const titleName=sanitizeFileName(customTitle);
     const fileName=(titleName || 'banchi-a4-orizzontale') + '.png';
-
     const a=document.createElement('a');
     a.download=fileName;
     a.href=finalCanvas.toDataURL('image/png');
