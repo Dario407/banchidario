@@ -72,6 +72,7 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
       <button id="resetBtn">Azzera</button>
       <button id="saveBtn">Salva disposizione</button>
       <button id="loadBtn">Ripristina salvata</button>
+      <button id="rotateBtn">Gira aula</button>
       <button class="primary" id="imageBtn">Salva come immagine</button>
     </div>
   </div>
@@ -93,12 +94,27 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
 <script>
 const state=Array.from({length:12},()=>["",""]);
 let customTitle="";
+let flipped=false;
 
 function render(){
   document.getElementById('sheetTitle').textContent=customTitle || '';
-  const rows=document.getElementById('rows');
-  rows.innerHTML='';
-  for(let r=0;r<4;r++){
+
+  const classroom=document.querySelector('.classroom');
+  classroom.innerHTML='';
+
+  const teacher=document.createElement('div');
+  teacher.className='teacher';
+  teacher.textContent='CATTEDRA';
+
+  const rows=document.createElement('div');
+  rows.id='rows';
+
+  const rowOrder=flipped ? [3,2,1,0] : [0,1,2,3];
+  const deskOrder=flipped ? [2,1,0] : [0,1,2];
+
+  if(!flipped) classroom.appendChild(teacher);
+
+  for(const r of rowOrder){
     const row=document.createElement('div');
     row.className='row';
 
@@ -107,14 +123,16 @@ function render(){
     label.textContent=(r+1)+'ª fila';
     row.appendChild(label);
 
-    for(let c=0;c<3;c++){
-      const di=r*3+c;
+    for(const cIndex of deskOrder){
+      const di=r*3+cIndex;
       const desk=document.createElement('div');
       desk.className='desk';
-      desk.innerHTML='<div class="desk-head">Bancata '+(c+1)+'</div><div class="seats"></div>';
+      desk.innerHTML='<div class="desk-head">Bancata '+(cIndex+1)+'</div><div class="seats"></div>';
       const seats=desk.querySelector('.seats');
 
-      for(let si=0;si<2;si++){
+      const seatOrder=flipped ? [1,0] : [0,1];
+
+      for(const si of seatOrder){
         const input=document.createElement('input');
         input.className='seat-input';
         input.type='text';
@@ -128,8 +146,12 @@ function render(){
     }
     rows.appendChild(row);
   }
-}
 
+  classroom.appendChild(rows);
+  if(flipped) classroom.appendChild(teacher);
+
+  document.getElementById('rotateBtn').textContent = flipped ? 'Vista normale' : 'Gira aula';
+}
 function sanitizeFileName(str){
   return (str || '')
     .trim()
@@ -147,8 +169,10 @@ document.getElementById('resetBtn').onclick=()=>{
   if(!confirm('Azzerare tutta la disposizione?')) return;
   for(let i=0;i<12;i++) state[i]=['',''];
   customTitle='';
+  flipped=false;
   localStorage.removeItem('planner3bes-free');
   localStorage.removeItem('planner3bes-free-title');
+  localStorage.removeItem('planner3bes-free-flipped');
   document.getElementById('titleInput').value='';
   render();
 };
@@ -156,6 +180,7 @@ document.getElementById('resetBtn').onclick=()=>{
 document.getElementById('saveBtn').onclick=()=>{
   localStorage.setItem('planner3bes-free',JSON.stringify(state));
   localStorage.setItem('planner3bes-free-title',customTitle);
+  localStorage.setItem('planner3bes-free-flipped',flipped ? '1' : '0');
   const btn=document.getElementById('saveBtn');
   const old=btn.textContent;
   btn.textContent='Salvato';
@@ -166,15 +191,22 @@ document.getElementById('loadBtn').onclick=()=>{
   try{
     const saved=JSON.parse(localStorage.getItem('planner3bes-free'));
     const savedTitle=localStorage.getItem('planner3bes-free-title') || '';
+    const savedFlipped=localStorage.getItem('planner3bes-free-flipped') === '1';
     if(Array.isArray(saved)&&saved.length===12){
       for(let i=0;i<12;i++){
         state[i]=Array.isArray(saved[i])?[saved[i][0]||'',saved[i][1]||'']:['',''];
       }
     }
     customTitle=savedTitle;
+    flipped=savedFlipped;
     document.getElementById('titleInput').value=customTitle;
     render();
   }catch(e){}
+};
+
+document.getElementById('rotateBtn').onclick=()=>{
+  flipped=!flipped;
+  render();
 };
 
 document.getElementById('imageBtn').onclick=async()=>{
