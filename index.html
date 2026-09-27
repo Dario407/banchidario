@@ -8,48 +8,30 @@
 :root{--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--line:#dfe5ee;--accent:#2f6fed;--shadow:0 10px 28px rgba(30,55,90,.08)}
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:1180px;margin:0 auto;padding:24px}
+.wrap{max-width:1280px;margin:0 auto;padding:24px}
 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
-h1{font-size:28px;margin:0 0 6px}
+h1{font-size:29px;margin:0 0 6px}
 .sub{color:var(--muted);font-size:14px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 button{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:650;cursor:pointer}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .title-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px}
 .title-box label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:8px}
-.title-box input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:12px 10px;font-size:15px;color:#172033;outline:none}
+.title-box input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:12px 10px;font-size:16px;color:#172033;outline:none}
 .title-box input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
-.print-sheet{background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:24px;box-shadow:var(--shadow);aspect-ratio:297 / 210;display:flex;flex-direction:column;justify-content:flex-start}
-.sheet-title{text-align:center;font-size:28px;font-weight:800;margin:0 0 18px;color:#172033;min-height:34px;word-break:break-word}
-.classroom{background:#eef2f8;border:1px solid #d6ddea;border-radius:18px;padding:22px;flex:1}
-.teacher{width:min(420px,90%);margin:0 auto 24px;background:#253858;color:white;text-align:center;padding:11px 16px;border-radius:12px;font-weight:800;letter-spacing:.04em}
-.row{display:grid;grid-template-columns:100px repeat(3,1fr);gap:14px;align-items:stretch;margin-bottom:14px}
+.print-sheet{background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:28px;box-shadow:var(--shadow);aspect-ratio:297 / 210;display:flex;flex-direction:column;justify-content:flex-start}
+.sheet-title{text-align:center;font-size:32px;font-weight:800;margin:0 0 20px;color:#172033;min-height:38px;word-break:break-word}
+.classroom{background:#eef2f8;border:1px solid #d6ddea;border-radius:18px;padding:26px;flex:1}
+.teacher{width:min(460px,90%);margin:0 auto 26px;background:#253858;color:white;text-align:center;padding:12px 18px;border-radius:14px;font-weight:800;letter-spacing:.04em;font-size:18px}
+.row{display:grid;grid-template-columns:110px repeat(3,1fr);gap:16px;align-items:stretch;margin-bottom:16px}
 .row:last-child{margin-bottom:0}
-.row-label{display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:800;color:#344054;min-height:118px}
-.desk{background:#fff;border:1px solid #dfe5ee;border-radius:16px;padding:12px;min-height:118px;box-shadow:0 4px 12px rgba(30,55,90,.05)}
-.desk-head{font-size:12px;color:#667085;font-weight:800;margin-bottom:9px;text-align:center}
-.seats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-input.seat-input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:11px 9px;font-size:14px;color:#172033;outline:none;text-align:center;font-weight:650}
+.row-label{display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:800;color:#344054;min-height:126px;font-size:15px}
+.desk{background:#fff;border:1px solid #dfe5ee;border-radius:16px;padding:14px;min-height:126px;box-shadow:0 4px 12px rgba(30,55,90,.05)}
+.desk-head{font-size:14px;color:#667085;font-weight:800;margin-bottom:10px;text-align:center}
+.seats{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+input.seat-input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:11px 9px;font-size:15px;line-height:1.2;color:#172033;outline:none;text-align:center;font-weight:650;min-height:44px}
 input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
-.export-seat{
-  width:100%;
-  min-height:42px;
-  border:1px solid #ccd4df;
-  background:#f8fafc;
-  border-radius:10px;
-  padding:8px 7px;
-  font-size:14px;
-  line-height:1.2;
-  color:#172033;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  font-weight:650;
-  overflow:visible;
-  white-space:normal;
-  word-break:break-word;
-}
+.export-seat{width:100%;min-height:44px;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:8px 7px;font-size:15px;line-height:1.2;color:#172033;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:650;overflow:visible;white-space:normal;word-break:break-word}
 @media(max-width:900px){
   .wrap{padding:12px}
   .top{flex-direction:column;gap:12px}
@@ -58,15 +40,15 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
   .actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
   .actions button{width:100%;padding:12px 8px;font-size:13px}
   .print-sheet{padding:12px;aspect-ratio:auto}
-  .sheet-title{font-size:22px;margin-bottom:12px}
+  .sheet-title{font-size:24px;margin-bottom:12px;min-height:30px}
   .classroom{padding:12px}
-  .teacher{margin-bottom:14px}
+  .teacher{margin-bottom:14px;font-size:16px}
   .row{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
   .row-label{grid-column:1/-1;min-height:auto;padding:8px;font-size:13px}
   .desk{min-height:126px;padding:9px}
-  .desk-head{font-size:11px}
+  .desk-head{font-size:12px}
   .seats{grid-template-columns:1fr;gap:7px}
-  input.seat-input{font-size:14px;padding:10px 8px}
+  input.seat-input,.export-seat{font-size:14px;min-height:42px}
 }
 @media(max-width:600px){
   .actions{grid-template-columns:1fr}
@@ -74,7 +56,7 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
   .row-label{grid-column:1}
   .desk{min-height:auto}
   .seats{grid-template-columns:1fr 1fr;gap:8px}
-  input.seat-input{font-size:15px;padding:11px 8px}
+  input.seat-input,.export-seat{font-size:15px;min-height:44px}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -96,12 +78,11 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
 
   <div class="title-box">
     <label for="titleInput">Titolo sopra la cattedra</label>
-    <input id="titleInput" type="text" placeholder="Es. Sistemazione banchi 3BES - ottobre 2026">
+    <input id="titleInput" type="text" placeholder="Es. Sistemazione banchi 3BES - novembre">
   </div>
 
   <div class="print-sheet" id="printSheet">
     <div class="sheet-title" id="sheetTitle"></div>
-
     <div class="classroom">
       <div class="teacher">CATTEDRA</div>
       <div id="rows"></div>
@@ -115,7 +96,6 @@ let customTitle="";
 
 function render(){
   document.getElementById('sheetTitle').textContent=customTitle || '';
-
   const rows=document.getElementById('rows');
   rows.innerHTML='';
   for(let r=0;r<4;r++){
@@ -144,12 +124,18 @@ function render(){
         input.addEventListener('input',()=>{state[di][si]=input.value});
         seats.appendChild(input);
       }
-
       row.appendChild(desk);
     }
-
     rows.appendChild(row);
   }
+}
+
+function sanitizeFileName(str){
+  return (str || '')
+    .trim()
+    .replace(/[\\/:*?"<>|]/g,'')
+    .replace(/\s+/g,' ')
+    .slice(0,120);
 }
 
 document.getElementById('titleInput').addEventListener('input',e=>{
@@ -199,19 +185,14 @@ document.getElementById('imageBtn').onclick=async()=>{
   btn.disabled=true;
 
   try{
-    const shot=await html2canvas(target,{
-      backgroundColor:'#ffffff',
-      scale:2,
-      useCORS:true,
-      onclone:(doc)=>{
-        doc.querySelectorAll('#printSheet input.seat-input').forEach(input=>{
-          const replacement=doc.createElement('div');
-          replacement.className='export-seat';
-          replacement.textContent=input.value.trim();
-          input.replaceWith(replacement);
-        });
-      }
-    });
+    const shot=await html2canvas(target,{backgroundColor:'#ffffff',scale:2,useCORS:true,onclone:(doc)=>{
+      doc.querySelectorAll('#printSheet input.seat-input').forEach(input=>{
+        const replacement=doc.createElement('div');
+        replacement.className='export-seat';
+        replacement.textContent=input.value.trim();
+        input.replaceWith(replacement);
+      });
+    }});
 
     const finalCanvas=document.createElement('canvas');
     finalCanvas.width=3508;
@@ -221,7 +202,7 @@ document.getElementById('imageBtn').onclick=async()=>{
     ctx.fillStyle='#ffffff';
     ctx.fillRect(0,0,finalCanvas.width,finalCanvas.height);
 
-    const margin=120;
+    const margin=100;
     const maxW=finalCanvas.width-margin*2;
     const maxH=finalCanvas.height-margin*2;
 
@@ -233,8 +214,11 @@ document.getElementById('imageBtn').onclick=async()=>{
 
     ctx.drawImage(shot,x,y,drawW,drawH);
 
+    const titleName=sanitizeFileName(customTitle);
+    const fileName=(titleName || 'banchi-a4-orizzontale') + '.png';
+
     const a=document.createElement('a');
-    a.download='banchi-a4-orizzontale.png';
+    a.download=fileName;
     a.href=finalCanvas.toDataURL('image/png');
     a.click();
   }catch(e){
