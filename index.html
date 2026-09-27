@@ -15,15 +15,22 @@ h1{font-size:28px;margin:0 0 6px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 button{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:650;cursor:pointer}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.classroom{background:#eef2f8;border:1px solid #d6ddea;border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.title-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px}
+.title-box label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:8px}
+.title-box input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:12px 10px;font-size:15px;color:#172033;outline:none}
+.title-box input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
+.print-sheet{background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:24px;box-shadow:var(--shadow);aspect-ratio:297 / 210;display:flex;flex-direction:column;justify-content:flex-start}
+.sheet-title{text-align:center;font-size:28px;font-weight:800;margin:0 0 18px;color:#172033;min-height:34px;word-break:break-word}
+.classroom{background:#eef2f8;border:1px solid #d6ddea;border-radius:18px;padding:22px;flex:1}
 .teacher{width:min(420px,90%);margin:0 auto 24px;background:#253858;color:white;text-align:center;padding:11px 16px;border-radius:12px;font-weight:800;letter-spacing:.04em}
 .row{display:grid;grid-template-columns:100px repeat(3,1fr);gap:14px;align-items:stretch;margin-bottom:14px}
+.row:last-child{margin-bottom:0}
 .row-label{display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;font-weight:800;color:#344054;min-height:118px}
 .desk{background:#fff;border:1px solid #dfe5ee;border-radius:16px;padding:12px;min-height:118px;box-shadow:0 4px 12px rgba(30,55,90,.05)}
 .desk-head{font-size:12px;color:#667085;font-weight:800;margin-bottom:9px;text-align:center}
 .seats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:11px 9px;font-size:14px;color:#172033;outline:none;text-align:center;font-weight:650}
-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
+input.seat-input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:11px 9px;font-size:14px;color:#172033;outline:none;text-align:center;font-weight:650}
+input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
 @media(max-width:900px){
   .wrap{padding:12px}
   .top{flex-direction:column;gap:12px}
@@ -31,6 +38,8 @@ input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
   .sub{font-size:13px}
   .actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
   .actions button{width:100%;padding:12px 8px;font-size:13px}
+  .print-sheet{padding:12px;aspect-ratio:auto}
+  .sheet-title{font-size:22px;margin-bottom:12px}
   .classroom{padding:12px}
   .teacher{margin-bottom:14px}
   .row{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
@@ -38,7 +47,7 @@ input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
   .desk{min-height:126px;padding:9px}
   .desk-head{font-size:11px}
   .seats{grid-template-columns:1fr;gap:7px}
-  input{font-size:14px;padding:10px 8px}
+  input.seat-input{font-size:14px;padding:10px 8px}
 }
 @media(max-width:600px){
   .actions{grid-template-columns:1fr}
@@ -46,7 +55,7 @@ input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
   .row-label{grid-column:1}
   .desk{min-height:auto}
   .seats{grid-template-columns:1fr 1fr;gap:8px}
-  input{font-size:15px;padding:11px 8px}
+  input.seat-input{font-size:15px;padding:11px 8px}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -56,7 +65,7 @@ input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
   <div class="top">
     <div>
       <h1>Planner Banchi 3BES</h1>
-      <div class="sub">Scrivi liberamente i nomi nei posti e salva la disposizione.</div>
+      <div class="sub">Scrivi liberamente i nomi nei posti, aggiungi un titolo e salva la disposizione.</div>
     </div>
     <div class="actions">
       <button id="resetBtn">Azzera</button>
@@ -66,16 +75,28 @@ input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
     </div>
   </div>
 
-  <div class="classroom">
-    <div class="teacher">CATTEDRA</div>
-    <div id="rows"></div>
+  <div class="title-box">
+    <label for="titleInput">Titolo sopra la cattedra</label>
+    <input id="titleInput" type="text" placeholder="Es. Sistemazione banchi 3BES - ottobre 2026">
+  </div>
+
+  <div class="print-sheet" id="printSheet">
+    <div class="sheet-title" id="sheetTitle"></div>
+
+    <div class="classroom">
+      <div class="teacher">CATTEDRA</div>
+      <div id="rows"></div>
+    </div>
   </div>
 </div>
 
 <script>
 const state=Array.from({length:12},()=>["",""]);
+let customTitle="";
 
 function render(){
+  document.getElementById('sheetTitle').textContent=customTitle || '';
+
   const rows=document.getElementById('rows');
   rows.innerHTML='';
   for(let r=0;r<4;r++){
@@ -96,6 +117,7 @@ function render(){
 
       for(let si=0;si<2;si++){
         const input=document.createElement('input');
+        input.className='seat-input';
         input.type='text';
         input.placeholder='Nome';
         input.value=state[di][si];
@@ -103,21 +125,32 @@ function render(){
         input.addEventListener('input',()=>{state[di][si]=input.value});
         seats.appendChild(input);
       }
+
       row.appendChild(desk);
     }
+
     rows.appendChild(row);
   }
 }
 
+document.getElementById('titleInput').addEventListener('input',e=>{
+  customTitle=e.target.value;
+  document.getElementById('sheetTitle').textContent=customTitle;
+});
+
 document.getElementById('resetBtn').onclick=()=>{
   if(!confirm('Azzerare tutta la disposizione?')) return;
   for(let i=0;i<12;i++) state[i]=['',''];
+  customTitle='';
   localStorage.removeItem('planner3bes-free');
+  localStorage.removeItem('planner3bes-free-title');
+  document.getElementById('titleInput').value='';
   render();
 };
 
 document.getElementById('saveBtn').onclick=()=>{
   localStorage.setItem('planner3bes-free',JSON.stringify(state));
+  localStorage.setItem('planner3bes-free-title',customTitle);
   const btn=document.getElementById('saveBtn');
   const old=btn.textContent;
   btn.textContent='Salvato';
@@ -127,28 +160,60 @@ document.getElementById('saveBtn').onclick=()=>{
 document.getElementById('loadBtn').onclick=()=>{
   try{
     const saved=JSON.parse(localStorage.getItem('planner3bes-free'));
+    const savedTitle=localStorage.getItem('planner3bes-free-title') || '';
     if(Array.isArray(saved)&&saved.length===12){
-      for(let i=0;i<12;i++) state[i]=Array.isArray(saved[i])?[saved[i][0]||'',saved[i][1]||'']:['',''];
-      render();
+      for(let i=0;i<12;i++){
+        state[i]=Array.isArray(saved[i])?[saved[i][0]||'',saved[i][1]||'']:['',''];
+      }
     }
+    customTitle=savedTitle;
+    document.getElementById('titleInput').value=customTitle;
+    render();
   }catch(e){}
 };
 
 document.getElementById('imageBtn').onclick=async()=>{
-  const target=document.querySelector('.classroom');
+  const target=document.getElementById('printSheet');
   const btn=document.getElementById('imageBtn');
   const old=btn.textContent;
   btn.textContent='Creo immagine...';
   btn.disabled=true;
+
   try{
-    const canvas=await html2canvas(target,{backgroundColor:'#eef2f8',scale:2,useCORS:true});
+    const shot=await html2canvas(target,{
+      backgroundColor:'#ffffff',
+      scale:2,
+      useCORS:true
+    });
+
+    const finalCanvas=document.createElement('canvas');
+    finalCanvas.width=3508;
+    finalCanvas.height=2480;
+    const ctx=finalCanvas.getContext('2d');
+
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,finalCanvas.width,finalCanvas.height);
+
+    const margin=120;
+    const maxW=finalCanvas.width-margin*2;
+    const maxH=finalCanvas.height-margin*2;
+
+    const ratio=Math.min(maxW/shot.width,maxH/shot.height);
+    const drawW=shot.width*ratio;
+    const drawH=shot.height*ratio;
+    const x=(finalCanvas.width-drawW)/2;
+    const y=(finalCanvas.height-drawH)/2;
+
+    ctx.drawImage(shot,x,y,drawW,drawH);
+
     const a=document.createElement('a');
-    a.download='banchi-3bes.png';
-    a.href=canvas.toDataURL('image/png');
+    a.download='banchi-a4-orizzontale.png';
+    a.href=finalCanvas.toDataURL('image/png');
     a.click();
   }catch(e){
     alert("Non sono riuscito a creare l'immagine.");
   }
+
   btn.textContent=old;
   btn.disabled=false;
 };
