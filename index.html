@@ -31,6 +31,25 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .seats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 input.seat-input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:11px 9px;font-size:14px;color:#172033;outline:none;text-align:center;font-weight:650}
 input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
+.export-seat{
+  width:100%;
+  min-height:42px;
+  border:1px solid #ccd4df;
+  background:#f8fafc;
+  border-radius:10px;
+  padding:8px 7px;
+  font-size:14px;
+  line-height:1.2;
+  color:#172033;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-weight:650;
+  overflow:visible;
+  white-space:normal;
+  word-break:break-word;
+}
 @media(max-width:900px){
   .wrap{padding:12px}
   .top{flex-direction:column;gap:12px}
@@ -119,7 +138,7 @@ function render(){
         const input=document.createElement('input');
         input.className='seat-input';
         input.type='text';
-        input.placeholder='Nome';
+        input.placeholder='';
         input.value=state[di][si];
         input.autocomplete='off';
         input.addEventListener('input',()=>{state[di][si]=input.value});
@@ -183,7 +202,15 @@ document.getElementById('imageBtn').onclick=async()=>{
     const shot=await html2canvas(target,{
       backgroundColor:'#ffffff',
       scale:2,
-      useCORS:true
+      useCORS:true,
+      onclone:(doc)=>{
+        doc.querySelectorAll('#printSheet input.seat-input').forEach(input=>{
+          const replacement=doc.createElement('div');
+          replacement.className='export-seat';
+          replacement.textContent=input.value.trim();
+          input.replaceWith(replacement);
+        });
+      }
     });
 
     const finalCanvas=document.createElement('canvas');
