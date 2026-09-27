@@ -223,31 +223,44 @@ document.getElementById('imageBtn').onclick=async()=>{
   btn.disabled=true;
 
   try{
-    const shot=await html2canvas(target,{backgroundColor:'#ffffff',scale:2,useCORS:true,onclone:(doc)=>{
-      doc.querySelectorAll('#printSheet input.seat-input').forEach(input=>{
-        const replacement=doc.createElement('div');
-        replacement.className='export-seat';
-        replacement.textContent=input.value.trim();
-        input.replaceWith(replacement);
-      });
-    }});
+    const finalWidth=3508;
+    const finalHeight=2480;
+    const targetWidth=Math.max(1,target.getBoundingClientRect().width);
+    const renderScale=Math.max(3,Math.min(5,(finalWidth/targetWidth)*1.35));
+
+    const shot=await html2canvas(target,{
+      backgroundColor:'#ffffff',
+      scale:renderScale,
+      useCORS:true,
+      logging:false,
+      onclone:(doc)=>{
+        doc.querySelectorAll('#printSheet input.seat-input').forEach(input=>{
+          const replacement=doc.createElement('div');
+          replacement.className='export-seat';
+          replacement.textContent=input.value.trim();
+          input.replaceWith(replacement);
+        });
+      }
+    });
 
     const finalCanvas=document.createElement('canvas');
-    finalCanvas.width=3508;
-    finalCanvas.height=2480;
+    finalCanvas.width=finalWidth;
+    finalCanvas.height=finalHeight;
     const ctx=finalCanvas.getContext('2d');
     ctx.fillStyle='#ffffff';
-    ctx.fillRect(0,0,finalCanvas.width,finalCanvas.height);
+    ctx.fillRect(0,0,finalWidth,finalHeight);
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality='high';
 
     const margin=90;
-    const maxW=finalCanvas.width-margin*2;
-    const maxH=finalCanvas.height-margin*2;
+    const maxW=finalWidth-margin*2;
+    const maxH=finalHeight-margin*2;
     const ratio=Math.min(maxW/shot.width,maxH/shot.height);
-    const drawW=shot.width*ratio;
-    const drawH=shot.height*ratio;
-    const x=(finalCanvas.width-drawW)/2;
-    const y=(finalCanvas.height-drawH)/2;
-    ctx.drawImage(shot,x,y,drawW,drawH);
+    const drawW=Math.round(shot.width*ratio);
+    const drawH=Math.round(shot.height*ratio);
+    const x=Math.round((finalWidth-drawW)/2);
+    const y=Math.round((finalHeight-drawH)/2);
+    ctx.drawImage(shot,0,0,shot.width,shot.height,x,y,drawW,drawH);
 
     const titleName=sanitizeFileName(customTitle);
     const fileName=(titleName || 'banchi-a4-orizzontale') + '.png';
