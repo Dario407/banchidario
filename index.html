@@ -15,12 +15,13 @@ h1{font-size:30px;margin:0 0 6px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 button{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:650;cursor:pointer}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.title-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px}
-.title-box label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:8px}
-.title-box input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:13px 11px;font-size:17px;color:#172033;outline:none}
-.title-box input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
-.print-sheet{background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:28px 26px 30px;box-shadow:var(--shadow)}
+.meta-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px;display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:12px}
+.meta-field label{display:block;font-size:13px;font-weight:700;color:#344054;margin-bottom:8px}
+.meta-field input{width:100%;border:1px solid #ccd4df;background:#f8fafc;border-radius:10px;padding:13px 11px;font-size:17px;color:#172033;outline:none}
+.meta-field input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237,.12)}
+.print-sheet{position:relative;background:#fff;border:1px solid #d6ddea;border-radius:18px;padding:28px 26px 52px;box-shadow:var(--shadow)}
 .sheet-title{text-align:center;font-size:40px;font-weight:800;line-height:1.1;margin:6px 0 24px;color:#172033;word-break:break-word}
+.sheet-date{position:absolute;right:28px;bottom:16px;font-size:16px;font-weight:700;color:#667085;line-height:1}
 .classroom{background:#fff;border:1px solid #dfe5ee;border-radius:18px;padding:26px 24px 28px}
 .teacher{width:min(500px,90%);margin:0 auto 24px;background:#253858;color:white;text-align:center;padding:13px 18px;border-radius:14px;font-weight:800;letter-spacing:.04em;font-size:22px}
 .row{display:grid;grid-template-columns:115px repeat(3,1fr);gap:18px;align-items:stretch;margin-bottom:18px}
@@ -38,6 +39,7 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
     input.seat-input,.export-seat{font-size:18px;min-height:48px}
 }
 @media(max-width:900px){
+  .meta-box{grid-template-columns:1fr}
   .wrap{padding:12px}
   .top{flex-direction:column;gap:12px}
   h1{font-size:24px}
@@ -83,24 +85,40 @@ input.seat-input:focus{border-color:#2f6fed;box-shadow:0 0 0 3px rgba(47,111,237
     </div>
   </div>
 
-  <div class="title-box">
-    <label for="titleInput">Titolo sopra la cattedra</label>
-    <input id="titleInput" type="text" placeholder="Es. Sistemazione banchi 3BES - novembre">
+  <div class="meta-box">
+    <div class="meta-field">
+      <label for="titleInput">Titolo sopra la cattedra</label>
+      <input id="titleInput" type="text" placeholder="Es. Sistemazione banchi 3BES - novembre">
+    </div>
+    <div class="meta-field date-field">
+      <label for="dateInput">Data</label>
+      <input id="dateInput" type="date">
+    </div>
   </div>
 
   <div class="print-sheet" id="printSheet">
     <div class="sheet-title" id="sheetTitle"></div>
     <div class="classroom" id="classroom"></div>
+    <div class="sheet-date" id="sheetDate"></div>
   </div>
 </div>
 
 <script>
 const state=Array.from({length:12},()=>["",""]);
 let customTitle="";
+let customDate="";
 let flipped=false;
+
+function formatDate(value){
+  if(!value) return '';
+  const parts=value.split('-');
+  if(parts.length!==3) return value;
+  return parts[2]+'/'+parts[1]+'/'+parts[0];
+}
 
 function render(){
   document.getElementById('sheetTitle').textContent=customTitle || '';
+  document.getElementById('sheetDate').textContent=customDate ? formatDate(customDate) : '';
   const classroom=document.getElementById('classroom');
   classroom.innerHTML='';
 
@@ -171,21 +189,30 @@ document.getElementById('titleInput').addEventListener('input',e=>{
   document.getElementById('sheetTitle').textContent=customTitle;
 });
 
+document.getElementById('dateInput').addEventListener('input',e=>{
+  customDate=e.target.value;
+  document.getElementById('sheetDate').textContent=customDate ? formatDate(customDate) : '';
+});
+
 document.getElementById('resetBtn').onclick=()=>{
   if(!confirm('Azzerare tutta la disposizione?')) return;
   for(let i=0;i<12;i++) state[i]=['',''];
   customTitle='';
+  customDate='';
   flipped=false;
   localStorage.removeItem('planner3bes-free');
   localStorage.removeItem('planner3bes-free-title');
+  localStorage.removeItem('planner3bes-free-date');
   localStorage.removeItem('planner3bes-free-flipped');
   document.getElementById('titleInput').value='';
+  document.getElementById('dateInput').value='';
   render();
 };
 
 document.getElementById('saveBtn').onclick=()=>{
   localStorage.setItem('planner3bes-free',JSON.stringify(state));
   localStorage.setItem('planner3bes-free-title',customTitle);
+  localStorage.setItem('planner3bes-free-date',customDate);
   localStorage.setItem('planner3bes-free-flipped',flipped ? '1' : '0');
   const btn=document.getElementById('saveBtn');
   const old=btn.textContent;
@@ -197,6 +224,7 @@ document.getElementById('loadBtn').onclick=()=>{
   try{
     const saved=JSON.parse(localStorage.getItem('planner3bes-free'));
     const savedTitle=localStorage.getItem('planner3bes-free-title') || '';
+    const savedDate=localStorage.getItem('planner3bes-free-date') || '';
     const savedFlipped=localStorage.getItem('planner3bes-free-flipped') === '1';
     if(Array.isArray(saved)&&saved.length===12){
       for(let i=0;i<12;i++){
@@ -204,8 +232,10 @@ document.getElementById('loadBtn').onclick=()=>{
       }
     }
     customTitle=savedTitle;
+    customDate=savedDate;
     flipped=savedFlipped;
     document.getElementById('titleInput').value=customTitle;
+    document.getElementById('dateInput').value=customDate;
     render();
   }catch(e){}
 };
